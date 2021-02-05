@@ -101,8 +101,8 @@ Schauen ob evtl. Fehlermeldungen auftauchen und evtl. Abhängigkeiten nachinstal
 
 Schritt 8 - Konfiguration via Startskript (die Variante mit "my.env" funktionierte bei mir nicht)
 
-	  cd ~/nightscout
-    sudo nano start.sh	
+    cd ~/nightscout
+    nano start.sh	
 
 Dort werden alle Einstellungen (Konfig, Plugins, etc vorgenommen):
 
