@@ -107,7 +107,7 @@ Schritt 8 - Konfiguration via Startskript (die Variante mit "my.env" funktionier
 Dort werden alle Einstellungen (Konfig, Plugins, etc vorgenommen):
 
         #!/bin/sh
-	cd /home/user/nightscout
+    cd /home/user/nightscout
         export AUTH_DEFAULT_ROLES=denied
         export CUSTOM_TITLE="Mein Nightscout"
         export API_SECRET=PASSWORT
