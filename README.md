@@ -65,8 +65,14 @@ dann die eigentliche Nightscout Datenbank und Nightscout User anlegen:
 Schritt 5 - NodeJS 
 
     sudo apt update
-    sudo apt-get install nodejs npm
+    sudo apt-get install npm
 
+Versionen testen:
+
+    npm -v
+    nodejs -v
+    node -v
+    
 ( eventuell hilft auch diese Anleitung: https://github.com/audstanley/NodeJs-Raspberry-Pi/
 	sudo wget -O - https://raw.githubusercontent.com/audstanley/NodeJs-Raspberry-Pi/master/Install-Node.sh | sudo bash node -v )
 
@@ -74,6 +80,10 @@ Schritt 5 - NodeJS
 Schritt 6 - Nightscout Version herunterladen (13.0.1. läuft auf pi3, bei 14 hatte ich Probleme)
 
 Kopiere die Sourcen z.B. ins Home Verzechnis des Benutzers:
+
+Falls noch nicht vorhanden, wget und unzip installieren:
+    
+    sudo apt-get wget unzip
 
     wget https://github.com/nightscout/cgm-remote-monitor/archive/13.0.1.zip
 
@@ -90,6 +100,8 @@ Damit später einfacher ein Update installiert, oder eine andere Version zum tes
 Schritt 7 - Nightscout installieren
 
     cd ~/nightscout
+    npm update
+    npm i npm@latest -g
     npm install
 
 Dabei auf eventuelle Fehlermeldungen achten. Bei mir musste npm noch einmal aktualisiert werden, damit es fehlerfrei durchlief 
