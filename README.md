@@ -1,11 +1,14 @@
 # Nightscout-on-raspberry-pi
 Installation einer Nightscout Instanz auf einem lokalen Raspberry PI3 / Building the Nightscout Website on own server with raspberry pi3
 
-basierend auf der Anleitung von Kitekater und Johnmales
+Basierend zu großen Teilen auf den Anleitungen von Kitekater und Johnmales und einigen anderen. 
+Ich habe dies hier vor allem als Gedankenstütze für mich zusammengefasst, damit ich mir nicht wieder alles zusammensuchen muss, 
+falls ich den Server neu aufsetzen muss/will.
  
 Debian Buster aarch64 Betriebssystem wird vorausgesetzt.
 
 Zugriff auf den Pi mit ssh, den Pi mit einer festen IP vom Router versehen. Optional: Den Pi über einen DynDNS Anbieter über das Internet erreichbar machen. Portfreigabe für tcp/1337 im Internetrouter einrichten, um Daten zu empfangen und die Webseite aufrufen zu können.
+Falls der Server über das Internet erreichbar sein soll, muss auf jeden Fall noch dafür gesorgt werden, dass eine Firewall (z.B. iptables) eingerichtet wird. Darauf gehe ich hier aber nicht weiter ein. 
 
 Schritt 1 - Debian aktualisieren
 
@@ -91,13 +94,16 @@ Entpacke die Sourcen:
 
 	sudo unzip /home/user/13.0.1.zip
 	
-Damit später einfacher ein Update installiert, oder eine andere Version zum testen gesetzt werden kann, wird ein symbolischer Link auf das aktuelle Sourcen Verzeichnis gesetzt.
+Damit später einfacher ein Update installiert, oder eine andere Version zum testen gesetzt werden kann, wird ein symbolischer Link auf das aktuelle Sourcen Verzeichnis gesetzt. Außerdem schreibt sich "nightscout" leichter als "cgm-remote-monitor-13.0.1". ;-)
 
 	sudo ln -s cgm-remote-monitor-13.0.1 nightscout
 	sudo chmod 777 cgm-remote-monitor-13.0.1
 
 
 Schritt 7 - Swap aktivieren
+
+Zumindest für die Installation über npm ist die Swapdatei nötig, sonst kommt es zum Abbruch. Der Speicher des pi3 reicht sonst nicht aus.
+Ob die Seite danach auch ohne Swap läuft, könnt ihr ja mal testen.
 
      sudo dd if=/dev/zero of=/swapfile bs=1M count=4048
      sudo chmod 0600 /swapfile
@@ -108,6 +114,7 @@ Damit die Auslagerungsdatei auch nach einem Neustart noch benutzt wird, die Date
 
      sudo nano /etc/fstab
      /swapfile    none    swap    sw      0 0
+
 
 Schritt 8 - Nightscout installieren
 
@@ -130,104 +137,104 @@ Schritt 9 - Konfiguration via Startskript (die Variante mit "my.env" funktionier
 
 Dort werden alle Einstellungen (Konfig, Plugins, etc vorgenommen):
 
-#!/bin/sh
-cd /home/user/nightscout
-export AUTH_DEFAULT_ROLES=denied
-export CUSTOM_TITLE="Mein Nightscout"
-export API_SECRET=PASSWORT
+	#!/bin/sh
+	cd /home/user/nightscout
+	export AUTH_DEFAULT_ROLES=denied
+	export CUSTOM_TITLE="Mein Nightscout"
+	export API_SECRET=PASSWORT
         
-#export SSL_KEY=/etc/letsencrypt/live/.../privkey.pem   (das wird später nachgetragen)
-#export SSL_CERT=/etc/letsencrypt/live/.../fullchain.pem
+	#export SSL_KEY=/etc/letsencrypt/live/.../privkey.pem   (das wird später nachgetragen)
+	#export SSL_CERT=/etc/letsencrypt/live/.../fullchain.pem
         
-BASE_URL="https://meine.nightscout.URL:1337"
+	BASE_URL="https://meine.nightscout.URL:1337"
         
-export MONGO_CONNECTION=mongodb://<"USER_NS">:<"PASSWORD_NS">@localhost:27017/nightscout
-
-export DISPLAY_UNITS=mg/dl
-export ENABLE="delta direction timeago devicestatus ar2 profile careportal boluscalc food rawbg iob cob bwp cage sage iage treatmentnotify basal pump openaps upbat errorcodes simplealarms bridge mmconnect loop"
-export DISABLE=""
-
-export TIME_FORMAT=24
-export NIGHT_MODE=off
-export SHOW_RAWBG=always
-export THEME=colors
-
-export ALARM_TIMEAGO_WARN=on
-export ALARM_TIMEAGO_WARN_MINS=15
-export ALARM_TIMEAGO_URGENT=on
-export ALARM_TIMEAGO_URGENT_MINS=30
-
-export PROFILE_HISTORY=off
-export PROFILE_MULTIPLE=off
-
-export BWP_WARN=0.50
-export BWP_URGENT=1.00
-export BWP_SNOOZE_MINS=10
-export BWP_SNOOZE=0.10
-
-export CAGE_ENABLE_ALERTS=true
-export CAGE_INFO=44
-export CAGE_WARN=48
-export CAGE_URGENT=72
-export CAGE_DISPLAY=hours
-
-export SAGE_ENABLE_ALERTS=false
-export SAGE_INFO=144
-export SAGE_WARN=164
-export SAGE_URGENT=166
-
-export IAGE_ENABLE_ALERTS=false
-export IAGE_INFO=44
-export IAGE_WARN=48
-export IAGE_URGENT=72
-export BRIDGE_USER_NAME=
-export BRIDGE_PASSWORD=
-export BRIDGE_INTERVAL=150000
-export BRIDGE_MAX_COUNT=1
-export BRIDGE_FIRST_FETCH_COUNT=3
-export BRIDGE_MAX_FAILURES=3
-export BRIDGE_MINUTES=1400
-
-export MMCONNECT_USER_NAME=
-export MMCONNECT_PASSWORD=
-export MMCONNECT_INTERVAL=60000
-export MMCONNECT_MAX_RETRY_DURATION=32
-export MMCONNECT_SGV_LIMIT=24
-export MMCONNECT_VERBOSE=false
-export MMCONNECT_STORE_RAW_DATA=false
-
-export DEVICESTATUS_ADVANCED="true"
-
-export PUMP_ENABLE_ALERTS=true
-export PUMP_FIELDS="reservoir battery clock status"
-export PUMP_RETRO_FIELDS="reservoir battery clock"
-export PUMP_WARN_CLOCK=30
-export PUMP_URGENT_CLOCK=60
-export PUMP_WARN_RES=50
-export PUMP_URGENT_RES=10
-export PUMP_WARN_BATT_P=30
-export PUMP_URGENT_BATT_P=20
-export PUMP_WARN_BATT_V=1.35
-export PUMP_URGENT_BATT_V=1.30
-
-export OPENAPS_ENABLE_ALERTS=false
-export OPENAPS_WARN=30
-export OPENAPS_URGENT=60
-export OPENAPS_FIELDS="status-symbol status-label iob meal-assist rssi freq"
-export OPENAPS_RETRO_FIELDS="status-symbol status-label iob meal-assist rssi"
-
-export LOOP_ENABLE_ALERTS=false
-export LOOP_WARN=30
-export LOOP_URGENT=60
-
-export SHOW_PLUGINS=careportal
-export SHOW_FORECAST="ar2 openaps"
-
-export LANGUAGE=en
-export SCALE_Y=log
-export EDIT_MODE=on
-        
-PORT=1337 node server.js &   
+	export MONGO_CONNECTION=mongodb://<"USER_NS">:<"PASSWORD_NS">@localhost:27017/nightscout
+	
+	export DISPLAY_UNITS=mg/dl
+	export ENABLE="delta direction timeago devicestatus ar2 profile careportal boluscalc food rawbg iob cob bwp cage sage iage treatmentnotify basal pump openaps upbat errorcodes simplealarms bridge mmconnect loop"
+	export DISABLE=""
+	
+	export TIME_FORMAT=24
+	export NIGHT_MODE=off
+	export SHOW_RAWBG=always
+	export THEME=colors
+	
+	export ALARM_TIMEAGO_WARN=on
+	export ALARM_TIMEAGO_WARN_MINS=15
+	export ALARM_TIMEAGO_URGENT=on
+	export ALARM_TIMEAGO_URGENT_MINS=30
+	
+	export PROFILE_HISTORY=off
+	export PROFILE_MULTIPLE=off
+	
+	export BWP_WARN=0.50
+	export BWP_URGENT=1.00
+	export BWP_SNOOZE_MINS=10
+	export BWP_SNOOZE=0.10
+	
+	export CAGE_ENABLE_ALERTS=true
+	export CAGE_INFO=44
+	export CAGE_WARN=48
+	export CAGE_URGENT=72
+	export CAGE_DISPLAY=hours
+	
+	export SAGE_ENABLE_ALERTS=false
+	export SAGE_INFO=144
+	export SAGE_WARN=164
+	export SAGE_URGENT=166
+	
+	export IAGE_ENABLE_ALERTS=false
+	export IAGE_INFO=44
+	export IAGE_WARN=48
+	export IAGE_URGENT=72
+	export BRIDGE_USER_NAME=
+	export BRIDGE_PASSWORD=
+	export BRIDGE_INTERVAL=150000
+	export BRIDGE_MAX_COUNT=1
+	export BRIDGE_FIRST_FETCH_COUNT=3
+	export BRIDGE_MAX_FAILURES=3
+	export BRIDGE_MINUTES=1400
+	
+	export MMCONNECT_USER_NAME=
+	export MMCONNECT_PASSWORD=
+	export MMCONNECT_INTERVAL=60000
+	export MMCONNECT_MAX_RETRY_DURATION=32
+	export MMCONNECT_SGV_LIMIT=24
+	export MMCONNECT_VERBOSE=false
+	export MMCONNECT_STORE_RAW_DATA=false
+	
+	export DEVICESTATUS_ADVANCED="true"
+	
+	export PUMP_ENABLE_ALERTS=true
+	export PUMP_FIELDS="reservoir battery clock status"
+	export PUMP_RETRO_FIELDS="reservoir battery clock"
+	export PUMP_WARN_CLOCK=30
+	export PUMP_URGENT_CLOCK=60
+	export PUMP_WARN_RES=50
+	export PUMP_URGENT_RES=10
+	export PUMP_WARN_BATT_P=30
+	export PUMP_URGENT_BATT_P=20
+	export PUMP_WARN_BATT_V=1.35
+	export PUMP_URGENT_BATT_V=1.30
+	
+	export OPENAPS_ENABLE_ALERTS=false
+	export OPENAPS_WARN=30
+	export OPENAPS_URGENT=60
+	export OPENAPS_FIELDS="status-symbol status-label iob meal-assist rssi freq"
+	export OPENAPS_RETRO_FIELDS="status-symbol status-label iob meal-assist rssi"
+	
+	export LOOP_ENABLE_ALERTS=false
+	export LOOP_WARN=30
+	export LOOP_URGENT=60
+	
+	export SHOW_PLUGINS=careportal
+	export SHOW_FORECAST="ar2 openaps"
+	
+	export LANGUAGE=en
+	export SCALE_Y=log
+	export EDIT_MODE=on
+	
+	PORT=1337 node server.js &   
 
 Das Skript jetz noch ausführbar machen:
         
@@ -237,7 +244,6 @@ Jetzt kann der Server im nightscout-Verzeichnis mit
 
     ./start.sh    
 gestartet werden. 
-
 
 
 Schritt 10 - Start/Stop mit Systemd-Service
@@ -358,7 +364,7 @@ Am Ende sieht meine Seite so aus:
       ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
     }
 
-Die letzen Zeilen sind die Verweise auf die Schlüssel. Diese tragen wir nun noch in die start.sh ein (siehe oben):
+Die letzen Zeilen sind die Verweise auf die Schlüssel. Diese tragen wir nun noch in die start.sh ein (siehe Schritt 9):
 
      export SSL_KEY=/etc/letsencrypt/live/meine.seite.url/privkey.pem   
      export SSL_CERT=/etc/letsencrypt/live/meine.seite.url/fullchain.pem
@@ -369,3 +375,6 @@ Dann noch einmal den nginx-Service und den nightscout-Sevice neu starten
     sudo systemctl restart nightscout
 
 Und dann sollte Nightscout im Browser erreichbar sein. 
+Nach einem Neustart des Pi kann es sein, dass der nginx und nightscout service nicht automatisch gestartet werden, da ein Fehler auftritt. 
+Dann die beiden mit systemctl restart noch mal neu starten (erst nginx, dann nightscout), dann sollte es klappen. 
+Scheinbar ist ein benötigter Service nicht schnell genug geladen, so dass die Fehlermeldung kommt. Muss ich bei Gelegenheit noch mal nachschauen, woran das liegt. 
