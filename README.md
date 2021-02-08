@@ -97,7 +97,19 @@ Damit später einfacher ein Update installiert, oder eine andere Version zum tes
 	sudo chmod 777 cgm-remote-monitor-13.0.1
 
 
-Schritt 7 - Nightscout installieren
+Schritt 7 - Swap aktivieren
+
+     sudo dd if=/dev/zero of=/swapfile bs=1M count=4048
+     sudo chmod 0600 /swapfile
+     sudo mkswap /swapfile 
+     sudo swapon /swapfile 
+     
+Damit die Auslagerungsdatei auch nach einem Neustart noch benutzt wird, die Datei /etc/fstab in einem Editor mit Rootrechten öffnen und dort diese Zeile anhängen:
+
+     sudo nano /etc/fstab
+     /swapfile    none    swap    sw      0 0
+
+Schritt 8 - Nightscout installieren
 
 Dabei auf eventuelle Fehlermeldungen achten. Bei mir musste npm noch einmal aktualisiert werden, damit es fehlerfrei durchlief 
 (npm install -g npm@latest).
@@ -111,111 +123,111 @@ Der Installationsvorgang sollte nun ohne Fehler durchlaufen. Kann bei einem pi3 
 Schauen ob evtl. Fehlermeldungen auftauchen und evtl. Abhängigkeiten nachinstalliert werden müssen.
 
 
-Schritt 8 - Konfiguration via Startskript (die Variante mit "my.env" funktionierte bei mir nicht)
+Schritt 9 - Konfiguration via Startskript (die Variante mit "my.env" funktionierte bei mir nicht)
 
     cd ~/nightscout
     nano start.sh	
 
 Dort werden alle Einstellungen (Konfig, Plugins, etc vorgenommen):
 
-        #!/bin/sh
-    cd /home/user/nightscout
-        export AUTH_DEFAULT_ROLES=denied
-        export CUSTOM_TITLE="Mein Nightscout"
-        export API_SECRET=PASSWORT
+#!/bin/sh
+cd /home/user/nightscout
+export AUTH_DEFAULT_ROLES=denied
+export CUSTOM_TITLE="Mein Nightscout"
+export API_SECRET=PASSWORT
         
-        #export SSL_KEY=/etc/letsencrypt/live/.../privkey.pem   (das wird später nachgetragen)
-        #export SSL_CERT=/etc/letsencrypt/live/.../fullchain.pem
+#export SSL_KEY=/etc/letsencrypt/live/.../privkey.pem   (das wird später nachgetragen)
+#export SSL_CERT=/etc/letsencrypt/live/.../fullchain.pem
         
-        BASE_URL="https://meine.nightscout.URL:1337"
+BASE_URL="https://meine.nightscout.URL:1337"
         
-        export MONGO_CONNECTION=mongodb://<"USER_NS">:<"PASSWORD_NS">@localhost:27017/nightscout
+export MONGO_CONNECTION=mongodb://<"USER_NS">:<"PASSWORD_NS">@localhost:27017/nightscout
 
-				export DISPLAY_UNITS=mg/dl
-				export ENABLE="delta direction timeago devicestatus ar2 profile careportal boluscalc food rawbg iob cob bwp cage sage iage treatmentnotify basal pump openaps upbat errorcodes simplealarms bridge mmconnect loop"
-				export DISABLE=""
+export DISPLAY_UNITS=mg/dl
+export ENABLE="delta direction timeago devicestatus ar2 profile careportal boluscalc food rawbg iob cob bwp cage sage iage treatmentnotify basal pump openaps upbat errorcodes simplealarms bridge mmconnect loop"
+export DISABLE=""
 
-				export TIME_FORMAT=24
-				export NIGHT_MODE=off
-				export SHOW_RAWBG=always
-				export THEME=colors
+export TIME_FORMAT=24
+export NIGHT_MODE=off
+export SHOW_RAWBG=always
+export THEME=colors
 
-				export ALARM_TIMEAGO_WARN=on
-				export ALARM_TIMEAGO_WARN_MINS=15
-				export ALARM_TIMEAGO_URGENT=on
-				export ALARM_TIMEAGO_URGENT_MINS=30
+export ALARM_TIMEAGO_WARN=on
+export ALARM_TIMEAGO_WARN_MINS=15
+export ALARM_TIMEAGO_URGENT=on
+export ALARM_TIMEAGO_URGENT_MINS=30
 
-				export PROFILE_HISTORY=off
-				export PROFILE_MULTIPLE=off
+export PROFILE_HISTORY=off
+export PROFILE_MULTIPLE=off
 
-				export BWP_WARN=0.50
-				export BWP_URGENT=1.00
-				export BWP_SNOOZE_MINS=10
-				export BWP_SNOOZE=0.10
+export BWP_WARN=0.50
+export BWP_URGENT=1.00
+export BWP_SNOOZE_MINS=10
+export BWP_SNOOZE=0.10
 
-				export CAGE_ENABLE_ALERTS=true
-				export CAGE_INFO=44
-				export CAGE_WARN=48
-				export CAGE_URGENT=72
-				export CAGE_DISPLAY=hours
+export CAGE_ENABLE_ALERTS=true
+export CAGE_INFO=44
+export CAGE_WARN=48
+export CAGE_URGENT=72
+export CAGE_DISPLAY=hours
 
-				export SAGE_ENABLE_ALERTS=false
-				export SAGE_INFO=144
-				export SAGE_WARN=164
-				export SAGE_URGENT=166
+export SAGE_ENABLE_ALERTS=false
+export SAGE_INFO=144
+export SAGE_WARN=164
+export SAGE_URGENT=166
 
-				export IAGE_ENABLE_ALERTS=false
-				export IAGE_INFO=44
-				export IAGE_WARN=48
-				export IAGE_URGENT=72
-				export BRIDGE_USER_NAME=
-				export BRIDGE_PASSWORD=
-				export BRIDGE_INTERVAL=150000
-				export BRIDGE_MAX_COUNT=1
-				export BRIDGE_FIRST_FETCH_COUNT=3
-				export BRIDGE_MAX_FAILURES=3
-				export BRIDGE_MINUTES=1400
+export IAGE_ENABLE_ALERTS=false
+export IAGE_INFO=44
+export IAGE_WARN=48
+export IAGE_URGENT=72
+export BRIDGE_USER_NAME=
+export BRIDGE_PASSWORD=
+export BRIDGE_INTERVAL=150000
+export BRIDGE_MAX_COUNT=1
+export BRIDGE_FIRST_FETCH_COUNT=3
+export BRIDGE_MAX_FAILURES=3
+export BRIDGE_MINUTES=1400
 
-				export MMCONNECT_USER_NAME=
-				export MMCONNECT_PASSWORD=
-				export MMCONNECT_INTERVAL=60000
-				export MMCONNECT_MAX_RETRY_DURATION=32
-				export MMCONNECT_SGV_LIMIT=24
-				export MMCONNECT_VERBOSE=false
-				export MMCONNECT_STORE_RAW_DATA=false
+export MMCONNECT_USER_NAME=
+export MMCONNECT_PASSWORD=
+export MMCONNECT_INTERVAL=60000
+export MMCONNECT_MAX_RETRY_DURATION=32
+export MMCONNECT_SGV_LIMIT=24
+export MMCONNECT_VERBOSE=false
+export MMCONNECT_STORE_RAW_DATA=false
 
-				export DEVICESTATUS_ADVANCED="true"
+export DEVICESTATUS_ADVANCED="true"
 
-				export PUMP_ENABLE_ALERTS=true
-				export PUMP_FIELDS="reservoir battery clock status"
-				export PUMP_RETRO_FIELDS="reservoir battery clock"
-				export PUMP_WARN_CLOCK=30
-				export PUMP_URGENT_CLOCK=60
-				export PUMP_WARN_RES=50
-				export PUMP_URGENT_RES=10
-				export PUMP_WARN_BATT_P=30
-				export PUMP_URGENT_BATT_P=20
-				export PUMP_WARN_BATT_V=1.35
-				export PUMP_URGENT_BATT_V=1.30
+export PUMP_ENABLE_ALERTS=true
+export PUMP_FIELDS="reservoir battery clock status"
+export PUMP_RETRO_FIELDS="reservoir battery clock"
+export PUMP_WARN_CLOCK=30
+export PUMP_URGENT_CLOCK=60
+export PUMP_WARN_RES=50
+export PUMP_URGENT_RES=10
+export PUMP_WARN_BATT_P=30
+export PUMP_URGENT_BATT_P=20
+export PUMP_WARN_BATT_V=1.35
+export PUMP_URGENT_BATT_V=1.30
 
-				export OPENAPS_ENABLE_ALERTS=false
-				export OPENAPS_WARN=30
-				export OPENAPS_URGENT=60
-				export OPENAPS_FIELDS="status-symbol status-label iob meal-assist rssi freq"
-				export OPENAPS_RETRO_FIELDS="status-symbol status-label iob meal-assist rssi"
+export OPENAPS_ENABLE_ALERTS=false
+export OPENAPS_WARN=30
+export OPENAPS_URGENT=60
+export OPENAPS_FIELDS="status-symbol status-label iob meal-assist rssi freq"
+export OPENAPS_RETRO_FIELDS="status-symbol status-label iob meal-assist rssi"
 
-				export LOOP_ENABLE_ALERTS=false
-				export LOOP_WARN=30
-				export LOOP_URGENT=60
+export LOOP_ENABLE_ALERTS=false
+export LOOP_WARN=30
+export LOOP_URGENT=60
 
-				export SHOW_PLUGINS=careportal
-				export SHOW_FORECAST="ar2 openaps"
+export SHOW_PLUGINS=careportal
+export SHOW_FORECAST="ar2 openaps"
 
-				export LANGUAGE=en
-				export SCALE_Y=log
-				export EDIT_MODE=on
+export LANGUAGE=en
+export SCALE_Y=log
+export EDIT_MODE=on
         
-        PORT=1337 node server.js &   
+PORT=1337 node server.js &   
 
 Das Skript jetz noch ausführbar machen:
         
@@ -228,7 +240,7 @@ gestartet werden.
 
 
 
-Schritt 9 - Start/Stop mit Systemd-Service
+Schritt 10 - Start/Stop mit Systemd-Service
 
 Im Verzeichnis /etc/systemd/system/ oder /lib/systemd/sytem/ (geht wohl beides) wird eine Service-Datei erstellt:
 
@@ -265,7 +277,7 @@ Dann den Nightscout-Service starten und auch bei Neustart automatisch starten la
 
 
 
-Schritt 10 - Nginx Server
+Schritt 11 - Nginx Server
 
 Wer jetzt noch weitermachen und seine Seite über das Internet aufrufen möchte, kann noch einen Reverse-Proxy mit Nginx aufsetzen:
 
@@ -301,7 +313,7 @@ Dann den Nginx-Service neu starten:
 
 
 
-Schritt 11 - Jetzt noch mit Let's Encrypt verschlüsseln
+Schritt 12 - Jetzt noch mit Let's Encrypt verschlüsseln
 
 Let's Encrypt installieren:
     
