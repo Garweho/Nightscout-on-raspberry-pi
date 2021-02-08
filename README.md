@@ -69,9 +69,9 @@ Schritt 5 - NodeJS
 
 Versionen testen:
 
-    npm -v
-    nodejs -v
-    node -v
+    npm -v	(sollte 6.14.1 sein)
+    nodejs -v	(sollte 10.23.1 sein)
+    node -v	(sollte 10.23.1 sein)
     
 ( eventuell hilft auch diese Anleitung: https://github.com/audstanley/NodeJs-Raspberry-Pi/
 	sudo wget -O - https://raw.githubusercontent.com/audstanley/NodeJs-Raspberry-Pi/master/Install-Node.sh | sudo bash node -v )
@@ -99,14 +99,14 @@ Damit später einfacher ein Update installiert, oder eine andere Version zum tes
 
 Schritt 7 - Nightscout installieren
 
-    cd ~/nightscout
-    npm update
-    npm i npm@latest -g
-    npm install
-
 Dabei auf eventuelle Fehlermeldungen achten. Bei mir musste npm noch einmal aktualisiert werden, damit es fehlerfrei durchlief 
 (npm install -g npm@latest).
-	
+
+    cd ~/nightscout
+    npm update
+    sudo npm i npm@latest -g    (muss als root ausgeführt werden)
+    npm install
+
 Der Installationsvorgang sollte nun ohne Fehler durchlaufen. Kann bei einem pi3 eine Weile dauern.
 Schauen ob evtl. Fehlermeldungen auftauchen und evtl. Abhängigkeiten nachinstalliert werden müssen.
 
