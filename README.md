@@ -104,6 +104,7 @@ Entpacke die Sourcen:/ unpack sources
 	sudo unzip /home/user/13.0.1.zip
 	
 Damit später einfacher ein Update installiert, oder eine andere Version zum testen gesetzt werden kann, wird ein symbolischer Link auf das aktuelle Sourcen Verzeichnis gesetzt. Außerdem schreibt sich "nightscout" leichter als "cgm-remote-monitor-13.0.1". ;-)
+
 A symbolic link is set to the current source directory so that an update can be installed more easily later, or a different version can be set for testing. In addition, "nightscout" is easier to write than "cgm-remote-monitor-13.0.1". ;-) 
 
 	sudo ln -s cgm-remote-monitor-13.0.1 nightscout
@@ -114,6 +115,7 @@ A symbolic link is set to the current source directory so that an update can be 
 
 Zumindest für die Installation über npm ist die Swapdatei nötig, sonst kommt es zum Abbruch. Der Speicher des pi3 reicht sonst nicht aus.
 Ob die Seite danach auch ohne Swap läuft, könnt ihr ja mal testen.
+
 The swap file is required at least for the installation via npm, otherwise it will be aborted as the memory of the pi3 is insufficient.
 You can test whether the site will run without swap afterwards. 
 
@@ -123,6 +125,7 @@ You can test whether the site will run without swap afterwards.
      sudo swapon /swapfile 
      
 Damit die Auslagerungsdatei auch nach einem Neustart noch benutzt wird, die Datei /etc/fstab in einem Editor mit Rootrechten öffnen und dort diese Zeile anhängen:
+
 So that the swap file is still used after a restart, open the file /etc/fstab in an editor with root rights and append this line there: 
 
      sudo nano /etc/fstab
@@ -133,6 +136,7 @@ So that the swap file is still used after a restart, open the file /etc/fstab in
 
 Dabei auf eventuelle Fehlermeldungen achten. Bei mir musste npm noch einmal aktualisiert werden, damit es fehlerfrei durchlief 
 (npm install -g npm@latest).
+
 Pay attention to any error messages. For me, npm had to be updated again so that it ran without errors
 (npm install -g npm @ latest). 
 
@@ -143,8 +147,10 @@ Pay attention to any error messages. For me, npm had to be updated again so that
 
 Der Installationsvorgang sollte nun ohne Fehler durchlaufen. Kann bei einem pi3 eine Weile dauern.
 Schauen ob evtl. Fehlermeldungen auftauchen und evtl. Abhängigkeiten nachinstalliert werden müssen.
+
 The installation process should now run without errors. Can take a while with a pi3.
 Check whether any error messages appear and whether any dependencies need to be reinstalled. 
+
 
 9 - Konfiguration via Startskript (die Variante mit "my.env" funktionierte bei mir nicht) / Configuration via script
 
@@ -152,7 +158,8 @@ Check whether any error messages appear and whether any dependencies need to be 
     nano start.sh	
 
 Dort werden alle Einstellungen (Konfig, Plugins, etc vorgenommen):
-There all settings (Config, plugins, and so on) will be made:
+
+All settings (config, plugins, and so on) will be made there:
 
 	#!/bin/sh
 	cd /home/user/nightscout
@@ -266,6 +273,7 @@ gestartet werden.
 10 - Start/Stop mit Systemd-Service
 
 Im Verzeichnis /etc/systemd/system/ oder /lib/systemd/sytem/ (geht wohl beides) wird eine Service-Datei erstellt:
+
 A service file is created in the directory / etc / systemd / system / or / lib / systemd / sytem / (both is possible): 
 
     sudo nano nightscout.service
@@ -291,6 +299,7 @@ Dann Neustart von systemd: / restart of systemd
     sudo systemctl daemon-reload
 
 Dann den Nightscout-Service starten und auch bei Neustart automatisch starten lassen:
+
 Starting Nightscout-Service and make it automatic startup on booting:
 
     sudo systemctl enable nightscout.service (das ".service" kann man auch weglassen)
@@ -305,11 +314,13 @@ Starting Nightscout-Service and make it automatic startup on booting:
 11 - Nginx Server
 
 Wer jetzt noch weitermachen und seine Seite über das Internet aufrufen möchte, kann noch einen Reverse-Proxy mit Nginx aufsetzen:
+
 If you want to go on and make your site accessable via Internet, you can set up a reverse proxy with Nginx: 
 
     sudo apt-get install nginx
 
 Im Verzeichnis /etc/nginx/sites-available eine Datei mit folgendem Inhalt erstellen:
+
 Create file in /etc/nginx/sies-available:
 
     sudo nano nightscout
@@ -331,6 +342,7 @@ Create file in /etc/nginx/sies-available:
     }
 
 Dann im Verzeichnis /etc/nginx/sites-enabled einen Symlink auf die Website legen:
+
 Then put a symlink to the website in the directory /etc/nginx/ sites-enabled: 
 
     sudo ln -s /etc/nginx/sites-available/nightscout /etc/nginx/sites-enabled/nightscout
@@ -349,6 +361,7 @@ Let's Encrypt installieren:
     sudo certbot
 
 Let's Encrypt möchte Änderungen an der Seite vornehmen, das kann man zulassen.
+
 Let's Encrypt wants to make changes to the page, that can be allowed.
 
 Danach die Seite nochmal aufrufen: / Open site again:
@@ -388,12 +401,14 @@ Am Ende sieht meine Seite so aus: / Should look like this:
     }
 
 Die letzen Zeilen sind die Verweise auf die Schlüssel. Diese tragen wir nun noch in die start.sh ein (siehe Schritt 9):
+
 The last lines are the references to the keys. We now enter this in start.sh (see step 9): 
 
      export SSL_KEY=/etc/letsencrypt/live/meine.seite.url/privkey.pem   
      export SSL_CERT=/etc/letsencrypt/live/meine.seite.url/fullchain.pem
 
 Dann noch einmal den nginx-Service und den nightscout-Sevice neu starten
+
 Restart nginx-service and nightscout-service
 
     sudo systemctl restart nginx
