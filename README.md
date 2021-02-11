@@ -10,13 +10,21 @@ Debian Buster aarch64 Betriebssystem wird vorausgesetzt.
 Zugriff auf den Pi mit ssh, den Pi mit einer festen IP vom Router versehen. Optional: Den Pi über einen DynDNS Anbieter über das Internet erreichbar machen. Portfreigabe für tcp/1337 im Internetrouter einrichten, um Daten zu empfangen und die Webseite aufrufen zu können.
 Falls der Server über das Internet erreichbar sein soll, muss auf jeden Fall noch dafür gesorgt werden, dass eine Firewall (z.B. iptables) eingerichtet wird. Darauf gehe ich hier aber nicht weiter ein. 
 
-Schritt 1 - Debian aktualisieren
+Installation of a Nightscout instance on a local Raspberry PI3 / Building the Nightscout Website on own server with raspberry pi3
+
+Based in large part on the instructions from Kitekater and Johnmales and a few others. I have summarized this here mainly as a reminder for myself so that I don't have to look up everything again if I have to / want to set up the server again.
+
+Debian Buster aarch64 operating system is required for this.
+
+Access to the Pi with ssh, the Pi with a fixed IP from the router. Optional: Make the Pi accessible via a DynDNS provider over the Internet. Set up port sharing for tcp / 1337 in the Internet router in order to receive data and to be able to call up the website. If the server is to be accessible via the Internet, it must be ensured that a firewall (e.g. iptables) is set up. I will not go into that further here. 
+
+1) - Debian aktualisieren / Update Debian
 
 	sudo apt-get update
 	sudo apt-get upgrade
 
 
-Schritt 2 - Debian Stretch-Sourcen einstellen für MongoDB installation (geht bestimmt auch eleganter)
+2) - Debian Stretch-Sourcen einstellen für MongoDB Installation (geht bestimmt auch eleganter) / Choose Stretch-sources for MongoDB installation
 
     sudo nano /etc/apt/sources.list
     
@@ -38,39 +46,41 @@ Schritt 2 - Debian Stretch-Sourcen einstellen für MongoDB installation (geht be
     deb-src http://security.debian.org/ stretch/updates main contrib non-free
 
 
-Schritt 3 - MongoDB (3.2) installieren
+3) - MongoDB (3.2) installieren / Install MongoDB
 
 	sudo apt update 
     sudo apt install mongodb
 
-Danach die sourcen wieder auf Buster zurücksetzen!!!
+Danach die sourcen wieder auf Buster zurücksetzen! / Reset sources back to Buster after this step!
 
 
-Schritt 4 - MongoDB einrichten
+4) - MongoDB einrichten / Setup MongoDB
 
-Daten in <> durch eigene Daten ersetzen!!!	
+Daten in <> durch eigene Daten ersetzen! / Replace data in <> with own data!	
 
-User anlegen über die Mongo Shell:
+User anlegen über die Mongo Shell: / Create User:
 	
-erst den Admin:
+erst den Admin: / first Admin:
 
 	sudo mongo -shell
 	
 		use admin
 		db.createUser( { user: <"USER">, pwd: <"PASSWORD">, roles: [ "userAdminAnyDatabase" ] } )
 
-dann die eigentliche Nightscout Datenbank und Nightscout User anlegen: 
+dann die eigentliche Nightscout Datenbank und Nightscout User anlegen: / then Nightscout database and user:
 
 		use mongodb   
 		db.createUser( { user: <"USER_NS">, pwd: <"PASSWORD_NS">, roles: [ "readWrite", "dbAdmin" ] } )
 
 
-Schritt 5 - NodeJS 
+5) NodeJS 
 
-    sudo apt update
-    sudo apt-get install npm
 
-Versionen testen:
+      sudo apt update
+      sudo apt-get install npm
+
+
+Versionen testen: / test version
 
     npm -v	(sollte 6.14.1 sein)
     nodejs -v	(sollte 10.23.1 sein)
@@ -80,30 +90,33 @@ Versionen testen:
 	sudo wget -O - https://raw.githubusercontent.com/audstanley/NodeJs-Raspberry-Pi/master/Install-Node.sh | sudo bash node -v )
 
 
-Schritt 6 - Nightscout Version herunterladen (13.0.1. läuft auf pi3, bei 14 hatte ich Probleme)
+6) - Nightscout Version herunterladen (13.0.1. läuft auf pi3, bei 14 hatte ich Probleme) / Download Nightscout 13.0.1
 
-Kopiere die Sourcen z.B. ins Home Verzechnis des Benutzers:
+Kopiere die Sourcen z.B. ins Home Verzechnis des Benutzers: / Copy sources in home directory
 
-Falls noch nicht vorhanden, wget und unzip installieren:
+Falls noch nicht vorhanden, wget und unzip installieren: / If necessary install wget and unzip
     
     sudo apt-get wget unzip
 
     wget https://github.com/nightscout/cgm-remote-monitor/archive/13.0.1.zip
 
-Entpacke die Sourcen:
+Entpacke die Sourcen:/ unpack sources
 
 	sudo unzip /home/user/13.0.1.zip
 	
 Damit später einfacher ein Update installiert, oder eine andere Version zum testen gesetzt werden kann, wird ein symbolischer Link auf das aktuelle Sourcen Verzeichnis gesetzt. Außerdem schreibt sich "nightscout" leichter als "cgm-remote-monitor-13.0.1". ;-)
+A symbolic link is set to the current source directory so that an update can be installed more easily later, or a different version can be set for testing. In addition, "nightscout" is easier to write than "cgm-remote-monitor-13.0.1". ;-) 
 
 	sudo ln -s cgm-remote-monitor-13.0.1 nightscout
 	sudo chmod 777 cgm-remote-monitor-13.0.1
 
 
-Schritt 7 - Swap aktivieren
+7)- Swap aktivieren / activate swap
 
 Zumindest für die Installation über npm ist die Swapdatei nötig, sonst kommt es zum Abbruch. Der Speicher des pi3 reicht sonst nicht aus.
 Ob die Seite danach auch ohne Swap läuft, könnt ihr ja mal testen.
+The swap file is required at least for the installation via npm, otherwise it will be aborted as the memory of the pi3 is insufficient.
+You can test whether the site will run without swap afterwards. 
 
      sudo dd if=/dev/zero of=/swapfile bs=1M count=4048
      sudo chmod 0600 /swapfile
@@ -111,15 +124,18 @@ Ob die Seite danach auch ohne Swap läuft, könnt ihr ja mal testen.
      sudo swapon /swapfile 
      
 Damit die Auslagerungsdatei auch nach einem Neustart noch benutzt wird, die Datei /etc/fstab in einem Editor mit Rootrechten öffnen und dort diese Zeile anhängen:
+So that the swap file is still used after a restart, open the file /etc/fstab in an editor with root rights and append this line there: 
 
      sudo nano /etc/fstab
      /swapfile    none    swap    sw      0 0
 
 
-Schritt 8 - Nightscout installieren
+8) - Nightscout installieren / Install Nightscout
 
 Dabei auf eventuelle Fehlermeldungen achten. Bei mir musste npm noch einmal aktualisiert werden, damit es fehlerfrei durchlief 
 (npm install -g npm@latest).
+Pay attention to any error messages. For me, npm had to be updated again so that it ran without errors
+(npm install -g npm @ latest). 
 
     cd ~/nightscout
     npm update
@@ -128,14 +144,16 @@ Dabei auf eventuelle Fehlermeldungen achten. Bei mir musste npm noch einmal aktu
 
 Der Installationsvorgang sollte nun ohne Fehler durchlaufen. Kann bei einem pi3 eine Weile dauern.
 Schauen ob evtl. Fehlermeldungen auftauchen und evtl. Abhängigkeiten nachinstalliert werden müssen.
+The installation process should now run without errors. Can take a while with a pi3.
+Check whether any error messages appear and whether any dependencies need to be reinstalled. 
 
-
-Schritt 9 - Konfiguration via Startskript (die Variante mit "my.env" funktionierte bei mir nicht)
+9) - Konfiguration via Startskript (die Variante mit "my.env" funktionierte bei mir nicht) / Configuration via script
 
     cd ~/nightscout
     nano start.sh	
 
 Dort werden alle Einstellungen (Konfig, Plugins, etc vorgenommen):
+There all settings (Config, plugins, and so on) will be made:
 
 	#!/bin/sh
 	cd /home/user/nightscout
@@ -236,23 +254,24 @@ Dort werden alle Einstellungen (Konfig, Plugins, etc vorgenommen):
 	
 	PORT=1337 node server.js &   
 
-Das Skript jetz noch ausführbar machen:
+Das Skript jetz noch ausführbar machen: / Make the script executable:
         
     sudo chmod +x start.sh
         
-Jetzt kann der Server im nightscout-Verzeichnis mit 
+Jetzt kann der Server im nightscout-Verzeichnis mit: / Now you can start the server with:
 
     ./start.sh    
 gestartet werden. 
 
 
-Schritt 10 - Start/Stop mit Systemd-Service
+10) - Start/Stop mit Systemd-Service
 
 Im Verzeichnis /etc/systemd/system/ oder /lib/systemd/sytem/ (geht wohl beides) wird eine Service-Datei erstellt:
+A service file is created in the directory / etc / systemd / system / or / lib / systemd / sytem / (both is possible): 
 
     sudo nano nightscout.service
 
-mit folgender Konfiguration:
+mit folgender Konfiguration: / with following config:
 
     [Unit]
     Description=Nightscout Service      
@@ -268,28 +287,31 @@ mit folgender Konfiguration:
     [Install]
     WantedBy=multi-user.target
 
-Dann Neustart von systemd:
+Dann Neustart von systemd: / restart of systemd
 
     sudo systemctl daemon-reload
 
 Dann den Nightscout-Service starten und auch bei Neustart automatisch starten lassen:
+Starting Nightscout-Service and make it automatic startup on booting:
 
     sudo systemctl enable nightscout.service (das ".service" kann man auch weglassen)
     sudo systemctl start nightscout
 
-Überprüfung, ob der Service korrekt läuft, oder Fehler ausgibt:
+Überprüfung, ob der Service korrekt läuft, oder Fehler ausgibt: / Checking if service runs:
 
     sudo systemctl status nightscout
 
 
 
-Schritt 11 - Nginx Server
+11) - Nginx Server
 
 Wer jetzt noch weitermachen und seine Seite über das Internet aufrufen möchte, kann noch einen Reverse-Proxy mit Nginx aufsetzen:
+If you want to go on and make your site accessable via Internet, you can set up a reverse proxy with Nginx: 
 
     sudo apt-get install nginx
 
 Im Verzeichnis /etc/nginx/sites-available eine Datei mit folgendem Inhalt erstellen:
+Create file in /etc/nginx/sies-available:
 
     sudo nano nightscout
 
@@ -310,16 +332,17 @@ Im Verzeichnis /etc/nginx/sites-available eine Datei mit folgendem Inhalt erstel
     }
 
 Dann im Verzeichnis /etc/nginx/sites-enabled einen Symlink auf die Website legen:
+Then put a symlink to the website in the directory /etc/nginx/ sites-enabled: 
 
     sudo ln -s /etc/nginx/sites-available/nightscout /etc/nginx/sites-enabled/nightscout
 
-Dann den Nginx-Service neu starten:
+Dann den Nginx-Service neu starten: / Restart Nginx-service:
 
     sudo systemctl restart nginx
 
 
 
-Schritt 12 - Jetzt noch mit Let's Encrypt verschlüsseln
+12) - Jetzt noch mit Let's Encrypt verschlüsseln / Encrypt via Let's Encrypt
 
 Let's Encrypt installieren:
     
@@ -327,13 +350,14 @@ Let's Encrypt installieren:
     sudo certbot
 
 Let's Encrypt möchte Änderungen an der Seite vornehmen, das kann man zulassen.
+Let's Encrypt wants to make changes to the page, that can be allowed.
 
-Danach die Seite nochmal aufrufen:
+Danach die Seite nochmal aufrufen: / Open site again:
 
     cd /etc/nxinx/sites-available
     sudo nano nightscout
 
-Am Ende sieht meine Seite so aus:
+Am Ende sieht meine Seite so aus: / Should look like this:
 
     server {
           if ($host = meine.seite.url) {
@@ -365,11 +389,13 @@ Am Ende sieht meine Seite so aus:
     }
 
 Die letzen Zeilen sind die Verweise auf die Schlüssel. Diese tragen wir nun noch in die start.sh ein (siehe Schritt 9):
+The last lines are the references to the keys. We now enter this in start.sh (see step 9): 
 
      export SSL_KEY=/etc/letsencrypt/live/meine.seite.url/privkey.pem   
      export SSL_CERT=/etc/letsencrypt/live/meine.seite.url/fullchain.pem
 
 Dann noch einmal den nginx-Service und den nightscout-Sevice neu starten
+Restart nginx-service and nightscout-service
 
     sudo systemctl restart nginx
     sudo systemctl restart nightscout
@@ -378,3 +404,8 @@ Und dann sollte Nightscout im Browser erreichbar sein.
 Nach einem Neustart des Pi kann es sein, dass der nginx und nightscout service nicht automatisch gestartet werden, da ein Fehler auftritt. 
 Dann die beiden mit systemctl restart noch mal neu starten (erst nginx, dann nightscout), dann sollte es klappen. 
 Scheinbar ist ein benötigter Service nicht schnell genug geladen, so dass die Fehlermeldung kommt. Muss ich bei Gelegenheit noch mal nachschauen, woran das liegt. 
+
+After that the Nightscout should be accessible in the browser.
+After restarting the Pi, the nginx and nightscout service may not start automatically because an error occurs.
+Then restart the two with systemctl restart (first nginx, then nightscout), then it should work.
+Apparently a required service is not loaded fast enough so that the error message appears. I do have to look again at this to see why. 
