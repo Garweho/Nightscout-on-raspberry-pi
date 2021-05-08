@@ -170,7 +170,7 @@ All settings (config, plugins, and so on) will be made there:
 	#export SSL_KEY=/etc/letsencrypt/live/.../privkey.pem   (das wird später nachgetragen)
 	#export SSL_CERT=/etc/letsencrypt/live/.../fullchain.pem
         
-	BASE_URL="https://meine.nightscout.URL:1337"
+	BASE_URL=NIGHTSCOUT_SITE_URL
         
 	export MONGO_CONNECTION=mongodb://<"USER_NS">:<"PASSWORD_NS">@localhost:27017/nightscout
 	
